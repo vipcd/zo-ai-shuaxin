@@ -25,12 +25,12 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        # 👇 在这里同时安装 requests 和 playwright
         pip install requests playwright 
-        # 安装 Playwright 所需的浏览器内核
         playwright install chromium --with-deps
 
     - name: Execute Keep Alive Browser
       env:
+        # 👇 在这里把这两个密钥同时传递给运行脚本
         ZO_COOKIES_JSON: ${{ secrets.ZO_COOKIES_JSON }}
+        ZO_ACCESS_TOKEN: ${{ secrets.ZO_ACCESS_TOKEN }}
       run: python keep_alive.py
