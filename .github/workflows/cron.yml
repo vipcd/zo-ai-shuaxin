@@ -1,4 +1,4 @@
-name: Public Cron Trigger
+name: Public Browser Cron Trigger
 
 on:
   schedule:
@@ -6,16 +6,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-private-script:
-    runs-on: ubuntu-latest # 公开库的虚拟机运行完全免费，不扣除你的 2000 分钟额度
+  run-private-browser:
+    runs-on: ubuntu-latest # 免费环境
 
     steps:
-    # 第一步：使用你的 PAT 钥匙，把私有库的代码拉取到当前的公开库运行环境中
     - name: Pull Private Script
       uses: actions/checkout@v4
       with:
-        repository: 'vipcd/zo-ai-shuaxin-jiaoben' # 替换为你的私有库路径
-        token: ${{ secrets.MY_GITHUB_PAT }} # 跨库钥匙
+        repository: '你的GitHub用户名/你的私有仓库名' 
+        token: ${{ secrets.MY_GITHUB_PAT }}
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -25,10 +24,11 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install requests
+        pip install playwright
+        # 安装 Playwright 所需的浏览器内核
+        playwright install chromium --with-deps
 
-    # 第二步：运行私有库里拉取过来的脚本，并将环境变量注入进去
-    - name: Execute Keep Alive
+    - name: Execute Keep Alive Browser
       env:
-        ZO_ACCESS_TOKEN: ${{ secrets.ZO_ACCESS_TOKEN }} # 从当前公开库的 Secrets 中注入
+        ZO_COOKIES_JSON: ${{ secrets.ZO_COOKIES_JSON }}
       run: python keep_alive.py
