@@ -14,7 +14,7 @@ jobs:
     - name: Pull Private Script
       uses: actions/checkout@v4
       with:
-        repository: '你的GitHub用户名/my-private-scripts' # 替换为你的私有库路径
+        repository: 'vipcd/zo-ai-shuaxin-jiaoben' # 替换为你的私有库路径
         token: ${{ secrets.MY_GITHUB_PAT }} # 跨库钥匙
 
     - name: Set up Python
