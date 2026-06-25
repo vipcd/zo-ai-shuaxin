@@ -13,7 +13,7 @@ jobs:
     - name: Pull Private Script
       uses: actions/checkout@v4
       with:
-        repository: '你的GitHub用户名/你的私有仓库名' 
+        repository: 'vipcd/zo-ai-shuaxin-jiaoben' 
         token: ${{ secrets.MY_GITHUB_PAT }}
 
     - name: Set up Python
