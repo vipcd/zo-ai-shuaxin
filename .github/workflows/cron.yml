@@ -30,7 +30,15 @@ jobs:
 
     - name: Execute Keep Alive Browser
       env:
-        # 👇 在这里把这两个密钥同时传递给运行脚本
         ZO_COOKIES_JSON: ${{ secrets.ZO_COOKIES_JSON }}
         ZO_ACCESS_TOKEN: ${{ secrets.ZO_ACCESS_TOKEN }}
       run: python keep_alive.py
+
+    # 👇【核心新增】：无论运行成功还是失败，都强行把当前目录下所有的 .png 图片提取出来打包
+    - name: Upload Live Screenshots
+      uses: actions/upload-artifact@v4
+      if: always() # 确保即使脚本报错了，也能把报错截图传上来供你排查
+      with:
+        name: zo-computer-live-ui # 压缩包的名字
+        path: ./*.png             # 匹配所有的 png 截图
+        retention-days: 3         # 自动留存3天，过期自动清理节约空间
