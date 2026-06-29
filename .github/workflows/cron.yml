@@ -2,7 +2,7 @@ name: Public Browser Cron Trigger
 
 on:
   schedule:
-    - cron: '0 * * * *' # 每 30 分钟运行一次
+    - cron: '23 * * * *' # 
   workflow_dispatch:
 
 # 给工作流赋予删除历史记录的权限
