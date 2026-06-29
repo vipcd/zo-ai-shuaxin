@@ -5,6 +5,11 @@ on:
     - cron: '0 * * * *' # 每 30 分钟运行一次
   workflow_dispatch:
 
+# 给工作流赋予删除历史记录的权限
+permissions:
+  actions: write
+  contents: read
+
 jobs:
   run-private-browser:
     runs-on: ubuntu-latest # 保持你原本成功的免费环境，绝不动它
@@ -15,8 +20,7 @@ jobs:
       with:
         repository: '${{ github.repository_owner }}/zo-ai-shuaxin-jiaoben' 
         token: ${{ secrets.MY_GITHUB_PAT }}
-        ref: 'main' # 强制锁定主分支
-        # 🌟【核心修改】：精准指定只拉取私库里的 zo-ai.py 文件
+        ref: 'main'
         sparse-checkout: |
           zo-ai.py
         sparse-checkout-cone-mode: false
@@ -24,7 +28,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10' # 保持原样
+        python-version: '3.10'
 
     - name: Install Dependencies
       run: |
@@ -36,14 +40,22 @@ jobs:
       env:
         ZO_COOKIES_JSON: ${{ secrets.ZO_COOKIES_JSON }}
         ZO_ACCESS_TOKEN: ${{ secrets.ZO_ACCESS_TOKEN }}
-      # 🌟【修改点】：执行名字同步改为 zo-ai.py
       run: python zo-ai.py
 
-    # 👇【原封不动保留】：无论运行成功还是失败，都强行把当前目录下所有的 .png 图片提取出来打包
     - name: Upload Live Screenshots
       uses: actions/upload-artifact@v4
-      if: always() # 确保即使脚本报错了，也能把报错截图传上来供你排查
+      if: always() 
       with:
-        name: zo-computer-live-ui # 压缩包的名字
-        path: ./*.png             # 匹配所有的 png 截图
-        retention-days: 3         # 自动留存3天，过期自动清理节约空间
+        name: zo-computer-live-ui 
+        path: ./*.png             
+        retention-days: 2         # 🌟 同步修改：截图文件也只保留 2 天，到期自动彻底销毁
+
+    # 🌟【全新新增】：每次运行完毕后，自动去把你列表中 2 天前的旧历史记录斩草除根
+    - name: Clean up old workflow runs
+      uses: Mattraks/delete-workflow-runs@v2
+      if: always() # 确保无论脚本成功还是失败，都执行清理
+      with:
+        token: ${{ secrets.MY_GITHUB_PAT }} # 使用你的个人密钥执行删除
+        repository: ${{ github.repository }}
+        retain_days: 2                      # 🌟 只保留最近 2 天的历史记录
+        keep_minimum_runs: 3                # 🌟 保底行数：无论如何至少保留最近的 3 条记录，防止列表空掉
