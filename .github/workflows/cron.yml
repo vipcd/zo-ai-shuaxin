@@ -2,7 +2,7 @@ name: Public Browser Cron Trigger
 
 on:
   schedule:
-    - cron: '23 * * * *' # 
+    - cron: '17 */2 * * *' # 
   workflow_dispatch:
 
 # 给工作流赋予删除历史记录的权限
